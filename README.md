@@ -1,4 +1,5 @@
-#SoundView
+SoundView
+
 This application allows you to access the user's Spotify account and show the information of the Top Songs and Top Artists.
 
 #Usage
