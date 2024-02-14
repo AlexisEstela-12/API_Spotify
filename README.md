@@ -16,11 +16,11 @@ This project was created with [Nodejs](https://github.com/nodejs) ,templates [EJ
 1. Clone repository  https://github.com/AlexisEstela-12/SoundView.git
 2. Create a database in Mongo DB
 3. Create a .env file inside directory with this information (
-	**PORT_SERVER **=> information about the port where will be your server
+	**PORT_SERVER**=> information about the port where will be your server
 	**CLIENT_ID**=> value from your [spotify for developer](https://developer.spotify.com/ ) account
 	**REDIRECT_URL**=> URL where you will be redirected after authenticating with spotify 
 	**MONGO_DB**= URL for connection to mongodb database
 	**SECRET**= password for MONGODB) 
-4. Install every requirements from package.json with command in terminal ** npm install **
-5. Finally, use command ** nodemon app.js **
+4. Install every requirements from package.json with command in terminal **npm install**
+5. Finally, use command **nodemon app.js**
 
