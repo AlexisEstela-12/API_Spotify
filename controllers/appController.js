@@ -1,20 +1,17 @@
-var {statekey, generateRandomString,auth_token,refresh_token} = require('../Authentication/Token')
+var {statekey, generateRandomString,auth_token} = require('../Authentication/Token')
 var {user_info,top_tracks,top_artist} = require('../search/api_search')
-var cookie = require('cookie-parser')
 var querystring = require('querystring')
-require("dotenv").config()
-var request = require('request')
-const axios = require('axios')
-const User = require('../models/User')
 const {connectDB, saveDB, searchDB} =require("../Config_DB/database")
-const moment = require('moment-timezone')
+require("dotenv").config()
 
-// login task
+// login view, use the login.ejs template
 module.exports.login= (req,res) =>{
     res.render("login",{})
     }
 
-// spotify login   
+//* spotify platform authentication view
+// uses spotify developer account values: client id, scope, redirect_uri
+//*
 module.exports.spotify = (req,res) => {
     var state = generateRandomString(16);
     res.cookie(statekey,state)
@@ -29,8 +26,7 @@ module.exports.spotify = (req,res) => {
 
 }
 
-// logged task
-
+// authProcess view, use the logged.ejs template
 module.exports.authProcess = async (req,res) =>{
     try {
         var code = req.query.code || null;
@@ -47,7 +43,7 @@ module.exports.authProcess = async (req,res) =>{
             // clean cookies
             res.clearCookie(statekey);
 
-            // get token
+            // use auth_token function 
             const auth_token_response = await auth_token(code)
             const access_token = auth_token_response.data.access_token;
 
@@ -55,9 +51,13 @@ module.exports.authProcess = async (req,res) =>{
             // get basic info
             const user_info_response = await user_info(access_token)
             var personal_info = user_info_response.data;
-
+            // filter id from personal_info
             var id = personal_info.id
+
+            // save in database mongodb
             await saveDB(id,access_token)
+            
+            // save personal info in userData for saving in session
             var userData = {
                 name: personal_info.display_name,
                 email: personal_info.email,
@@ -66,6 +66,8 @@ module.exports.authProcess = async (req,res) =>{
                 followers:personal_info.followers.total,
                 image: personal_info.image
             }
+
+            // save in session user information and then redirect to logged
             req.session.userData = userData
             res.redirect(`/logged/${id}`) 
         }
@@ -77,9 +79,13 @@ module.exports.authProcess = async (req,res) =>{
     }
     
 }
+
+
+// logged view, use the logged.ejs template
 module.exports.logged = async (req, res) => {
 
     try{
+    // extract userData from session, id from params and send request to top_artist api 
     const userData = req.session.userData
     const id = req.params.id
     const artists_response = await top_artist(id)
@@ -92,6 +98,7 @@ module.exports.logged = async (req, res) => {
     console.log(error)
 }};
 
+// this function is used to search top_tracks with api and resend information to frontend
 module.exports.songs = async(req,res) =>{ 
     try{
         var id = req.params.id || null;
@@ -103,6 +110,5 @@ module.exports.songs = async(req,res) =>{
         }
     } catch{
         console.log("error")
-
     }
 }

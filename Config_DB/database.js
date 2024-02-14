@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 const User = require('../models/User')
-var {statekey, generateRandomString,auth_token,refresh_token} = require('../Authentication/Token')
 
 
+/**
+ * Function that initiates the connection with the database using the env values
+ */
 const connectDB = async() =>{
     try{
         const conn= await mongoose.connect(process.env.MONGODB_DB)
@@ -12,11 +14,18 @@ const connectDB = async() =>{
     }
 }
 
+/**
+ * 
+ * @param {string} id value used to look up the user's token to query the spotify api
+ * @param {string} token token value used for authentication in the spotify api
+ */
 const saveDB = async(id,token) =>{
+    // the user is found and verified
     const existingUser = await User.findOne({user_id: id})
     if (existingUser){
         console.log('The user is already in the DB')
     } else {
+        // If it is not saved, it is added to the database
         const newUser = new User({
             user_id: id,
             access_Token: token
@@ -26,6 +35,11 @@ const saveDB = async(id,token) =>{
     }
 }
 
+/**
+ * 
+ * @param {string} id value used to look up the user's token to query the spotify api
+ * @returns token that is associated with the entered id
+ */
 const searchDB = async(id) =>{
     try {   
     const user = await User.findOne({user_id: id})
@@ -37,5 +51,5 @@ const searchDB = async(id) =>{
 }
 
 
-
+// we export the function of connecting to DB, searching in DB and saving in DB
 module.exports = {connectDB, saveDB, searchDB}

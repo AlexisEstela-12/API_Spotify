@@ -33,7 +33,7 @@ app.use(express.static(__dirname + '/public'))
 // MongoDB database connection
 connectDB()
 
-
+// start server 
 app.listen(process.env.PORT_SERVER,()=>{
     console.log(`app listening on port ${process.env.PORT_SERVER}`)
 })
